@@ -67,15 +67,15 @@ These capabilities are already implemented in the codebase and are not planned w
 | Requirement | Phase | Status |
 |-------------|-------|--------|
 | HIST-01 | Phase 1 | Pending |
-| HIST-02 | Phase 1 | Pending |
-| HIST-03 | Phase 1 | Pending |
-| HIST-04 | Phase 1 | Pending |
-| HIST-05 | Phase 1 | Pending |
 | HIST-06 | Phase 1 | Pending |
 | HIST-07 | Phase 1 | Pending |
-| HIST-08 | Phase 1 | Pending |
-| HIST-09 | Phase 1 | Pending |
-| HIST-10 | Phase 1 | Pending |
+| HIST-02 | Phase 2 | Pending |
+| HIST-03 | Phase 2 | Pending |
+| HIST-04 | Phase 2 | Pending |
+| HIST-05 | Phase 2 | Pending |
+| HIST-08 | Phase 2 | Pending |
+| HIST-09 | Phase 2 | Pending |
+| HIST-10 | Phase 2 | Pending |
 
 **Coverage:**
 - v1 requirements (new work): 10 total
@@ -84,4 +84,4 @@ These capabilities are already implemented in the codebase and are not planned w
 
 ---
 *Requirements defined: 2026-05-20*
-*Last updated: 2026-05-20 after initial definition*
+*Last updated: 2026-05-20 after roadmap creation (phase assignments corrected)*
