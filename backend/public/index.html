@@ -1,0 +1,605 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>NL to SQL — Powered by Claude</title>
+    <style>
+      *,
+      *::before,
+      *::after {
+        box-sizing: border-box;
+        margin: 0;
+        padding: 0;
+      }
+
+      body {
+        font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
+        background: #0f1117;
+        color: #e2e8f0;
+        min-height: 100vh;
+        display: flex;
+        flex-direction: column;
+      }
+
+      header {
+        background: linear-gradient(135deg, #1a1f2e 0%, #16213e 100%);
+        border-bottom: 1px solid #2d3748;
+        padding: 1.25rem 2rem;
+        display: flex;
+        align-items: center;
+        gap: 1rem;
+      }
+
+      .logo {
+        font-size: 1.5rem;
+        font-weight: 700;
+        background: linear-gradient(135deg, #7c3aed, #3b82f6);
+        -webkit-background-clip: text;
+        -webkit-text-fill-color: transparent;
+      }
+
+      .subtitle {
+        color: #718096;
+        font-size: 0.85rem;
+      }
+
+      main {
+        display: flex;
+        flex: 1;
+        gap: 0;
+      }
+
+      .sidebar {
+        width: 280px;
+        background: #1a1f2e;
+        border-right: 1px solid #2d3748;
+        padding: 1.5rem 1rem;
+        overflow-y: auto;
+        flex-shrink: 0;
+      }
+
+      .sidebar h2 {
+        font-size: 0.75rem;
+        text-transform: uppercase;
+        letter-spacing: 0.08em;
+        color: #718096;
+        margin-bottom: 1rem;
+      }
+
+      .table-card {
+        background: #0f1117;
+        border: 1px solid #2d3748;
+        border-radius: 8px;
+        margin-bottom: 0.75rem;
+        overflow: hidden;
+      }
+
+      .table-card-header {
+        display: flex;
+        align-items: center;
+        gap: 0.5rem;
+        padding: 0.6rem 0.75rem;
+        cursor: pointer;
+        user-select: none;
+        font-size: 0.85rem;
+        font-weight: 600;
+        color: #a78bfa;
+      }
+
+      .table-card-header:hover {
+        background: #1a1f2e;
+      }
+
+      .table-card-body {
+        display: none;
+        padding: 0 0.75rem 0.5rem;
+      }
+      .table-card.open .table-card-body {
+        display: block;
+      }
+
+      .col-row {
+        display: flex;
+        justify-content: space-between;
+        padding: 0.25rem 0;
+        font-size: 0.78rem;
+        border-bottom: 1px solid #2d3748;
+      }
+      .col-row:last-child {
+        border-bottom: none;
+      }
+      .col-name {
+        color: #e2e8f0;
+      }
+      .col-type {
+        color: #718096;
+      }
+
+      .content {
+        flex: 1;
+        display: flex;
+        flex-direction: column;
+        padding: 1.5rem;
+        gap: 1.25rem;
+        overflow: auto;
+      }
+
+      .input-section {
+        background: #1a1f2e;
+        border: 1px solid #2d3748;
+        border-radius: 12px;
+        padding: 1.25rem;
+      }
+
+      .input-section label {
+        display: block;
+        font-size: 0.85rem;
+        color: #a78bfa;
+        font-weight: 600;
+        margin-bottom: 0.6rem;
+      }
+
+      .question-wrap {
+        display: flex;
+        gap: 0.75rem;
+        align-items: flex-end;
+      }
+
+      textarea {
+        flex: 1;
+        background: #0f1117;
+        border: 1px solid #2d3748;
+        border-radius: 8px;
+        color: #e2e8f0;
+        font-size: 0.95rem;
+        padding: 0.75rem 1rem;
+        resize: vertical;
+        min-height: 64px;
+        font-family: inherit;
+        line-height: 1.5;
+      }
+
+      textarea:focus {
+        outline: none;
+        border-color: #7c3aed;
+        box-shadow: 0 0 0 3px rgba(124, 58, 237, 0.15);
+      }
+
+      button.primary {
+        background: linear-gradient(135deg, #7c3aed, #3b82f6);
+        color: white;
+        border: none;
+        border-radius: 8px;
+        padding: 0.75rem 1.5rem;
+        font-size: 0.9rem;
+        font-weight: 600;
+        cursor: pointer;
+        white-space: nowrap;
+        transition: opacity 0.15s;
+      }
+
+      button.primary:hover {
+        opacity: 0.9;
+      }
+      button.primary:disabled {
+        opacity: 0.5;
+        cursor: not-allowed;
+      }
+
+      .examples {
+        display: flex;
+        flex-wrap: wrap;
+        gap: 0.5rem;
+        margin-top: 0.75rem;
+      }
+
+      .example-chip {
+        background: #0f1117;
+        border: 1px solid #2d3748;
+        border-radius: 20px;
+        padding: 0.3rem 0.75rem;
+        font-size: 0.78rem;
+        color: #a0aec0;
+        cursor: pointer;
+        transition: all 0.15s;
+      }
+
+      .example-chip:hover {
+        border-color: #7c3aed;
+        color: #a78bfa;
+      }
+
+      .result-section {
+        display: flex;
+        flex-direction: column;
+        gap: 1rem;
+      }
+
+      .sql-box {
+        background: #1a1f2e;
+        border: 1px solid #2d3748;
+        border-radius: 12px;
+        overflow: hidden;
+      }
+
+      .sql-box-header {
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+        padding: 0.6rem 1rem;
+        background: #16213e;
+        border-bottom: 1px solid #2d3748;
+      }
+
+      .sql-box-header span {
+        font-size: 0.75rem;
+        font-weight: 600;
+        text-transform: uppercase;
+        letter-spacing: 0.06em;
+        color: #718096;
+      }
+
+      .copy-btn {
+        background: transparent;
+        border: 1px solid #2d3748;
+        border-radius: 4px;
+        color: #718096;
+        font-size: 0.75rem;
+        padding: 0.2rem 0.6rem;
+        cursor: pointer;
+        transition: all 0.15s;
+      }
+      .copy-btn:hover {
+        border-color: #7c3aed;
+        color: #a78bfa;
+      }
+
+      pre {
+        padding: 1rem;
+        font-size: 0.88rem;
+        color: #7dd3fc;
+        overflow-x: auto;
+        white-space: pre-wrap;
+        word-break: break-word;
+        font-family: 'Fira Code', 'Cascadia Code', 'JetBrains Mono', monospace;
+      }
+
+      .explanation {
+        background: #1a1f2e;
+        border: 1px solid #2d3748;
+        border-left: 3px solid #7c3aed;
+        border-radius: 0 8px 8px 0;
+        padding: 0.75rem 1rem;
+        font-size: 0.88rem;
+        color: #a0aec0;
+        line-height: 1.6;
+      }
+
+      .table-wrap {
+        background: #1a1f2e;
+        border: 1px solid #2d3748;
+        border-radius: 12px;
+        overflow: hidden;
+      }
+
+      .table-wrap-header {
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+        padding: 0.6rem 1rem;
+        background: #16213e;
+        border-bottom: 1px solid #2d3748;
+      }
+
+      .table-wrap-header span {
+        font-size: 0.75rem;
+        font-weight: 600;
+        text-transform: uppercase;
+        letter-spacing: 0.06em;
+        color: #718096;
+      }
+
+      .row-count {
+        background: #0f1117;
+        border: 1px solid #2d3748;
+        border-radius: 12px;
+        padding: 0.15rem 0.6rem;
+        font-size: 0.75rem;
+        color: #a78bfa;
+      }
+
+      .table-scroll {
+        overflow-x: auto;
+      }
+
+      table {
+        width: 100%;
+        border-collapse: collapse;
+        font-size: 0.85rem;
+      }
+
+      th {
+        background: #0f1117;
+        padding: 0.6rem 1rem;
+        text-align: left;
+        font-size: 0.75rem;
+        text-transform: uppercase;
+        letter-spacing: 0.06em;
+        color: #718096;
+        white-space: nowrap;
+        border-bottom: 1px solid #2d3748;
+      }
+
+      td {
+        padding: 0.55rem 1rem;
+        border-bottom: 1px solid #1a1f2e;
+        color: #e2e8f0;
+        white-space: nowrap;
+      }
+
+      tr:last-child td {
+        border-bottom: none;
+      }
+      tr:hover td {
+        background: #16213e;
+      }
+
+      .null-val {
+        color: #4a5568;
+        font-style: italic;
+      }
+
+      .error-box {
+        background: #1a1f2e;
+        border: 1px solid #fc8181;
+        border-radius: 8px;
+        padding: 0.75rem 1rem;
+        color: #fc8181;
+        font-size: 0.88rem;
+        font-family: monospace;
+      }
+
+      .spinner {
+        display: inline-block;
+        width: 18px;
+        height: 18px;
+        border: 2px solid rgba(255, 255, 255, 0.2);
+        border-top-color: white;
+        border-radius: 50%;
+        animation: spin 0.7s linear infinite;
+        vertical-align: middle;
+      }
+      @keyframes spin {
+        to {
+          transform: rotate(360deg);
+        }
+      }
+
+      .empty-state {
+        text-align: center;
+        padding: 3rem 2rem;
+        color: #4a5568;
+      }
+      .empty-state svg {
+        opacity: 0.3;
+        margin-bottom: 1rem;
+      }
+      .empty-state p {
+        font-size: 0.95rem;
+      }
+    </style>
+  </head>
+  <body>
+    <header>
+      <div>
+        <div class="logo">NL → SQL</div>
+        <div class="subtitle">
+          Natural Language to SQL &mdash; Powered by Claude
+        </div>
+      </div>
+    </header>
+
+    <main>
+      <aside class="sidebar">
+        <h2>Database Schema</h2>
+        <div id="schemaContainer">Loading…</div>
+      </aside>
+
+      <div class="content">
+        <div class="input-section">
+          <label for="question">Ask a question about your data</label>
+          <div class="question-wrap">
+            <textarea
+              id="question"
+              placeholder="e.g. Show me the top 5 customers by total spending"
+              rows="3"
+            ></textarea>
+            <button class="primary" id="askBtn" onclick="ask()">Query</button>
+          </div>
+          <div class="examples" id="examples"></div>
+        </div>
+
+        <div class="result-section" id="results">
+          <div class="empty-state">
+            <svg
+              width="48"
+              height="48"
+              viewBox="0 0 24 24"
+              fill="none"
+              stroke="currentColor"
+              stroke-width="1.5"
+            >
+              <ellipse cx="12" cy="5" rx="9" ry="3" />
+              <path d="M3 5v14c0 1.657 4.03 3 9 3s9-1.343 9-3V5" />
+              <path d="M3 12c0 1.657 4.03 3 9 3s9-1.343 9-3" />
+            </svg>
+            <p>Ask a question above to generate SQL and see results</p>
+          </div>
+        </div>
+      </div>
+    </main>
+
+    <script>
+      const EXAMPLES = [
+        'Show all customers from New York',
+        'Top 5 products by revenue',
+        'Orders placed in May 2024',
+        'Total revenue per product category',
+        'Customers who have spent more than $150',
+        'Average order value by city',
+        'Products with less than 100 items in stock',
+        'Most recent 5 orders with customer names',
+      ];
+
+      async function loadSchema() {
+        const res = await fetch('/api/schema');
+        const tables = await res.json();
+        const container = document.getElementById('schemaContainer');
+        container.innerHTML = tables
+          .map(
+            (t) => `
+      <div class="table-card">
+        <div class="table-card-header" onclick="this.parentElement.classList.toggle('open')">
+          <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+            <rect x="3" y="3" width="18" height="18" rx="2"/><path d="M3 9h18M9 21V9"/>
+          </svg>
+          ${t.name}
+        </div>
+        <div class="table-card-body">
+          ${t.columns.map((c) => `<div class="col-row"><span class="col-name">${c.name}${c.pk ? ' 🔑' : ''}</span><span class="col-type">${c.type}</span></div>`).join('')}
+        </div>
+      </div>
+    `,
+          )
+          .join('');
+
+        // open first table by default
+        container.querySelector('.table-card')?.classList.add('open');
+      }
+
+      function buildExamples() {
+        const wrap = document.getElementById('examples');
+        wrap.innerHTML = EXAMPLES.map(
+          (e) =>
+            `<span class="example-chip" onclick="setQuestion(this.textContent)">${e}</span>`,
+        ).join('');
+      }
+
+      function setQuestion(q) {
+        document.getElementById('question').value = q;
+        ask();
+      }
+
+      async function ask() {
+        const question = document.getElementById('question').value.trim();
+        if (!question) return;
+
+        const btn = document.getElementById('askBtn');
+        btn.disabled = true;
+        btn.innerHTML = '<span class="spinner"></span> Asking…';
+
+        const results = document.getElementById('results');
+        results.innerHTML =
+          '<div class="empty-state"><span class="spinner"></span><p style="margin-top:1rem">Claude is generating SQL…</p></div>';
+
+        try {
+          const res = await fetch('/api/ask', {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({ question }),
+          });
+          const data = await res.json();
+
+          if (!res.ok) {
+            results.innerHTML = `
+          ${data.sql ? renderSqlBox(data.sql, data.explanation) : ''}
+          <div class="error-box">Error: ${escHtml(data.error || data.message || 'Unknown error')}</div>
+        `;
+            return;
+          }
+
+          results.innerHTML = `
+        ${renderSqlBox(data.sql, data.explanation)}
+        ${renderTable(data.columns, data.rows)}
+      `;
+        } catch (err) {
+          results.innerHTML = `<div class="error-box">Network error: ${escHtml(err.message)}</div>`;
+        } finally {
+          btn.disabled = false;
+          btn.textContent = 'Ask Claude';
+        }
+      }
+
+      function renderSqlBox(sql, explanation) {
+        return `
+      <div class="sql-box">
+        <div class="sql-box-header">
+          <span>Generated SQL</span>
+          <button class="copy-btn" onclick="copyText(${JSON.stringify(sql)}, this)">Copy</button>
+        </div>
+        <pre>${escHtml(sql)}</pre>
+      </div>
+      ${explanation ? `<div class="explanation">💡 ${escHtml(explanation)}</div>` : ''}
+    `;
+      }
+
+      function renderTable(columns, rows) {
+        if (!columns || columns.length === 0) {
+          return `<div class="table-wrap"><div style="padding:1rem;color:#718096;font-size:.88rem">Query executed — no rows returned.</div></div>`;
+        }
+        return `
+      <div class="table-wrap">
+        <div class="table-wrap-header">
+          <span>Results</span>
+          <span class="row-count">${rows.length} row${rows.length !== 1 ? 's' : ''}</span>
+        </div>
+        <div class="table-scroll">
+          <table>
+            <thead><tr>${columns.map((c) => `<th>${escHtml(c)}</th>`).join('')}</tr></thead>
+            <tbody>
+              ${rows
+                .map(
+                  (row) =>
+                    `<tr>${row
+                      .map(
+                        (cell) =>
+                          `<td>${
+                            cell === null || cell === undefined
+                              ? '<span class="null-val">NULL</span>'
+                              : escHtml(String(cell))
+                          }</td>`,
+                      )
+                      .join('')}</tr>`,
+                )
+                .join('')}
+            </tbody>
+          </table>
+        </div>
+      </div>
+    `;
+      }
+
+      function copyText(text, btn) {
+        navigator.clipboard.writeText(text);
+        btn.textContent = 'Copied!';
+        setTimeout(() => (btn.textContent = 'Copy'), 1500);
+      }
+
+      function escHtml(str) {
+        return String(str)
+          .replace(/&/g, '&amp;')
+          .replace(/</g, '&lt;')
+          .replace(/>/g, '&gt;')
+          .replace(/"/g, '&quot;');
+      }
+
+      document.getElementById('question').addEventListener('keydown', (e) => {
+        if (e.key === 'Enter' && (e.metaKey || e.ctrlKey)) ask();
+      });
+
+      loadSchema();
+      buildExamples();
+    </script>
+  </body>
+</html>
