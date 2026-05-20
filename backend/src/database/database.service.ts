@@ -109,6 +109,10 @@ export class DatabaseService implements OnModuleInit, OnModuleDestroy {
     `);
   }
 
+  prepare(sql: string): Database.Statement<unknown[]> {
+    return this.db.prepare(sql);
+  }
+
   private initHistory() {
     this.db.exec(`
       CREATE TABLE IF NOT EXISTS query_history (
