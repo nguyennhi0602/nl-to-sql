@@ -31,6 +31,11 @@ export class HistoryService {
       );
   }
 
+  deleteAll(): number {
+    const info = this.db.prepare('DELETE FROM query_history').run();
+    return info.changes;
+  }
+
   findAll(): HistoryEntryDto[] {
     type RawRow = {
       id: number;
