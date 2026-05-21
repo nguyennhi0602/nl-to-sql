@@ -90,6 +90,17 @@ Use these entry points:
 - `/gsd:execute-phase` for planned phase work
 
 Do not make direct repo edits outside a GSD workflow unless the user explicitly asks to bypass it.
+
+## Commit Approval Gate
+
+**Never commit without explicit user approval.** Before running any `git commit`:
+
+1. Show the user what will be committed (`git diff --staged` or a plain summary of changes)
+2. Wait for the user to explicitly say "approved", "commit", "yes", or equivalent
+3. Only then run `git commit`
+
+This applies to ALL commits — code changes, planning artifacts, fixes, and documentation.
+Exception: the user may pre-authorize a batch (e.g. "commit all planning docs") — honor that scope only.
 <!-- GSD:workflow-end -->
 
 <!-- GSD:profile-start -->
