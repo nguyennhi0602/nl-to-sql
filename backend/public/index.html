@@ -765,12 +765,38 @@
         return div;
       }
 
+      async function loadHistory() {
+        try {
+          const res = await fetch('/api/history');
+          const entries = await res.json();
+          entries.reverse();
+          const feed = document.getElementById('results');
+          if (entries.length === 0) return;
+          feed.innerHTML = '';
+          entries.forEach(e => feed.appendChild(buildHistoryCard(e, false)));
+          document.getElementById('clearHistoryBtn').style.display = 'block';
+          feed.lastElementChild.scrollIntoView({ behavior: 'smooth' });
+        } catch (err) {
+          console.error('loadHistory failed:', err);
+        }
+      }
+
+      async function clearHistory() {
+        if (!window.confirm('Clear all history?')) return;
+        await fetch('/api/history', { method: 'DELETE' });
+        const feed = document.getElementById('results');
+        feed.innerHTML = '';
+        feed.innerHTML = '<div class="empty-state"><svg width="48" height="48" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><ellipse cx="12" cy="5" rx="9" ry="3"/><path d="M3 5v14c0 1.657 4.03 3 9 3s9-1.343 9-3V5"/><path d="M3 12c0 1.657 4.03 3 9 3s9-1.343 9-3"/></svg><p>Ask a question above to generate SQL and see results</p></div>';
+        document.getElementById('clearHistoryBtn').style.display = 'none';
+      }
+
       document.getElementById('question').addEventListener('keydown', (e) => {
         if (e.key === 'Enter' && (e.metaKey || e.ctrlKey)) ask();
       });
 
       loadSchema();
       buildExamples();
+      loadHistory();
     </script>
   </body>
 </html>
