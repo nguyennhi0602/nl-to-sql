@@ -576,10 +576,10 @@
           <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
             <rect x="3" y="3" width="18" height="18" rx="2"/><path d="M3 9h18M9 21V9"/>
           </svg>
-          ${t.name}
+          ${escHtml(t.name)}
         </div>
         <div class="table-card-body">
-          ${t.columns.map((c) => `<div class="col-row"><span class="col-name">${c.name}${c.pk ? ' 🔑' : ''}</span><span class="col-type">${c.type}</span></div>`).join('')}
+          ${t.columns.map((c) => `<div class="col-row"><span class="col-name">${escHtml(c.name)}${c.pk ? ' 🔑' : ''}</span><span class="col-type">${escHtml(c.type)}</span></div>`).join('')}
         </div>
       </div>
     `,
@@ -669,7 +669,7 @@
       <div class="sql-box">
         <div class="sql-box-header">
           <span>Generated SQL</span>
-          <button class="copy-btn" onclick="copyText(${JSON.stringify(sql)}, this)">Copy</button>
+          <button class="copy-btn" data-sql="${escHtml(sql)}" onclick="copyText(this.dataset.sql, this)">Copy</button>
         </div>
         <pre>${escHtml(sql)}</pre>
       </div>
@@ -803,11 +803,16 @@
 
       async function clearHistory() {
         if (!window.confirm('Clear all history?')) return;
-        await fetch('/api/history', { method: 'DELETE' });
-        const feed = document.getElementById('results');
-        feed.innerHTML = '';
-        feed.innerHTML = '<div class="empty-state"><svg width="48" height="48" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><ellipse cx="12" cy="5" rx="9" ry="3"/><path d="M3 5v14c0 1.657 4.03 3 9 3s9-1.343 9-3V5"/><path d="M3 12c0 1.657 4.03 3 9 3s9-1.343 9-3"/></svg><p>Ask a question above to generate SQL and see results</p></div>';
-        document.getElementById('clearHistoryBtn').style.display = 'none';
+        try {
+          const res = await fetch('/api/history', { method: 'DELETE' });
+          if (!res.ok) throw new Error(`Server error: ${res.status}`);
+          const feed = document.getElementById('results');
+          feed.innerHTML = '<div class="empty-state"><svg width="48" height="48" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><ellipse cx="12" cy="5" rx="9" ry="3"/><path d="M3 5v14c0 1.657 4.03 3 9 3s9-1.343 9-3V5"/><path d="M3 12c0 1.657 4.03 3 9 3s9-1.343 9-3"/></svg><p>Ask a question above to generate SQL and see results</p></div>';
+          document.getElementById('clearHistoryBtn').style.display = 'none';
+        } catch (err) {
+          console.error('clearHistory failed:', err);
+          alert('Failed to clear history. Please try again.');
+        }
       }
 
       document.getElementById('question').addEventListener('keydown', (e) => {
