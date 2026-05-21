@@ -58,8 +58,16 @@ Plans:
   5. Each history card shows a "Copy SQL" button that writes the SQL to clipboard, and displays the result row count (e.g. "42 rows")
   6. Clicking "Clear history" and confirming removes all cards from the feed and sends DELETE /api/history
 
-**Plans**: TBD
-**UI hint**: yes
+**Plans**: 2 plans
+
+Plans:
+**Wave 1**
+
+- [ ] 02-01-PLAN.md — CSS component classes + card builder JS helpers (buildHistoryCard, buildPlaceholderCard, formatTimestamp)
+
+**Wave 2** *(blocked on Wave 1 completion)*
+
+- [ ] 02-02-PLAN.md — loadHistory(), clearHistory(), refactored ask() — full end-to-end chat feed behavior
 
 ## Progress
 
@@ -69,4 +77,4 @@ Phases execute in numeric order: 1 → 2
 | Phase | Plans Complete | Status | Completed |
 |-------|----------------|--------|-----------|
 | 1. Backend Persistence | 0/2 | Not started | - |
-| 2. Chat UI | 0/TBD | Not started | - |
+| 2. Chat UI | 0/2 | Not started | - |
