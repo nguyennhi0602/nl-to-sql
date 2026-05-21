@@ -706,6 +706,65 @@
           .replace(/"/g, '&quot;');
       }
 
+      function formatTimestamp(isoString) {
+        return new Date(isoString).toLocaleString('en-US', {
+          year: 'numeric',
+          month: 'long',
+          day: 'numeric',
+          hour: '2-digit',
+          minute: '2-digit',
+          hour12: false,
+        });
+      }
+
+      function buildPlaceholderCard(question) {
+        const div = document.createElement('div');
+        div.className = 'placeholder-card';
+        div.innerHTML =
+          '<span class="card-question">' + escHtml(question) + '</span>' +
+          '<span class="spinner"></span>' +
+          '<span style="font-size:0.75rem;color:#718096">Generating SQL…</span>';
+        return div;
+      }
+
+      function buildHistoryCard(entry, expanded) {
+        const div = document.createElement('div');
+        div.className = 'history-card' + (expanded ? ' expanded' : '');
+
+        const rowCount = (entry.columns && entry.columns.length > 0)
+          ? entry.rows.length
+          : null;
+
+        const badgeHtml = entry.error
+          ? '<span class="card-badge error">Error</span>'
+          : '<span class="card-badge">' + rowCount + ' row' + (rowCount !== 1 ? 's' : '') + '</span>';
+
+        const bodyHtml = entry.error
+          ? '<div class="error-box">' + escHtml(entry.error) + '</div>'
+          : renderSqlBox(entry.sql, entry.explanation) + renderTable(entry.columns || [], entry.rows || []);
+
+        const ts = formatTimestamp(entry.created_at);
+
+        div.innerHTML =
+          '<div class="history-card-header"' +
+            ' aria-expanded="' + String(!!expanded) + '"' +
+            ' aria-label="Toggle result"' +
+            ' onclick="this.closest(\'.history-card\').classList.toggle(\'expanded\');' +
+                      'this.setAttribute(\'aria-expanded\',' +
+                        'this.closest(\'.history-card\').classList.contains(\'expanded\'))">' +
+            '<svg class="card-chevron" aria-hidden="true" width="14" height="14"' +
+                ' viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">' +
+              '<polyline points="9 18 15 12 9 6"/>' +
+            '</svg>' +
+            '<span class="card-question">' + escHtml(entry.question) + '</span>' +
+            '<span class="card-timestamp">' + escHtml(ts) + '</span>' +
+            badgeHtml +
+          '</div>' +
+          '<div class="history-card-body">' + bodyHtml + '</div>';
+
+        return div;
+      }
+
       document.getElementById('question').addEventListener('keydown', (e) => {
         if (e.key === 'Enter' && (e.metaKey || e.ctrlKey)) ask();
       });
