@@ -618,7 +618,7 @@
         }
 
         const placeholderCard = buildPlaceholderCard(question);
-        feed.appendChild(placeholderCard);
+        feed.prepend(placeholderCard);
         placeholderCard.scrollIntoView({ behavior: 'smooth' });
 
         document.getElementById('clearHistoryBtn').style.display = 'block';
@@ -643,7 +643,7 @@
           };
           const newCard = buildHistoryCard(entry, true);
           placeholderCard.replaceWith(newCard);
-          newCard.scrollIntoView({ behavior: 'smooth' });
+          newCard.scrollIntoView({ behavior: 'smooth', block: 'start' });
         } catch (err) {
           const errMsg = (data && data.error) ? data.error : (data && data.message) ? data.message : err ? err.message : 'Unknown error';
           const errEntry = {
@@ -657,7 +657,7 @@
           };
           const errCard = buildHistoryCard(errEntry, true);
           placeholderCard.replaceWith(errCard);
-          errCard.scrollIntoView({ behavior: 'smooth' });
+          errCard.scrollIntoView({ behavior: 'smooth', block: 'start' });
         } finally {
           btn.disabled = false;
           btn.textContent = 'Query';
@@ -790,13 +790,12 @@
         try {
           const res = await fetch('/api/history');
           const entries = await res.json();
-          entries.reverse();
           const feed = document.getElementById('results');
           if (entries.length === 0) return;
           feed.innerHTML = '';
           entries.forEach(e => feed.appendChild(buildHistoryCard(e, false)));
           document.getElementById('clearHistoryBtn').style.display = 'block';
-          feed.lastElementChild.scrollIntoView({ behavior: 'smooth' });
+          feed.firstElementChild.scrollIntoView({ behavior: 'smooth' });
         } catch (err) {
           console.error('loadHistory failed:', err);
         }
