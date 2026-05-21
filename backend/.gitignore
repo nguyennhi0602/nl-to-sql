@@ -5,3 +5,4 @@ dist/
 *.db-wal
 .env.local
 .env.*.local
+.env
