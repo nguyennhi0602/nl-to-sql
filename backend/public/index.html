@@ -611,35 +611,56 @@
         btn.disabled = true;
         btn.innerHTML = '<span class="spinner"></span> Asking…';
 
-        const results = document.getElementById('results');
-        results.innerHTML =
-          '<div class="empty-state"><span class="spinner"></span><p style="margin-top:1rem">Claude is generating SQL…</p></div>';
+        const feed = document.getElementById('results');
 
+        if (feed.querySelector('.empty-state')) {
+          feed.innerHTML = '';
+        }
+
+        const placeholderCard = buildPlaceholderCard(question);
+        feed.appendChild(placeholderCard);
+        placeholderCard.scrollIntoView({ behavior: 'smooth' });
+
+        document.getElementById('clearHistoryBtn').style.display = 'block';
+
+        let data;
         try {
           const res = await fetch('/api/ask', {
             method: 'POST',
             headers: { 'Content-Type': 'application/json' },
             body: JSON.stringify({ question }),
           });
-          const data = await res.json();
+          data = await res.json();
 
-          if (!res.ok) {
-            results.innerHTML = `
-          ${data.sql ? renderSqlBox(data.sql, data.explanation) : ''}
-          <div class="error-box">Error: ${escHtml(data.error || data.message || 'Unknown error')}</div>
-        `;
-            return;
-          }
-
-          results.innerHTML = `
-        ${renderSqlBox(data.sql, data.explanation)}
-        ${renderTable(data.columns, data.rows)}
-      `;
+          const entry = {
+            question,
+            sql: data.sql,
+            explanation: data.explanation,
+            columns: data.columns || [],
+            rows: data.rows || [],
+            error: data.error || null,
+            created_at: new Date().toISOString(),
+          };
+          const newCard = buildHistoryCard(entry, true);
+          placeholderCard.replaceWith(newCard);
+          newCard.scrollIntoView({ behavior: 'smooth' });
         } catch (err) {
-          results.innerHTML = `<div class="error-box">Network error: ${escHtml(err.message)}</div>`;
+          const errMsg = (data && data.error) ? data.error : (data && data.message) ? data.message : err ? err.message : 'Unknown error';
+          const errEntry = {
+            question,
+            sql: (data && data.sql) || '',
+            explanation: (data && data.explanation) || '',
+            columns: [],
+            rows: [],
+            error: errMsg,
+            created_at: new Date().toISOString(),
+          };
+          const errCard = buildHistoryCard(errEntry, true);
+          placeholderCard.replaceWith(errCard);
+          errCard.scrollIntoView({ behavior: 'smooth' });
         } finally {
           btn.disabled = false;
-          btn.textContent = 'Ask Claude';
+          btn.textContent = 'Query';
         }
       }
 
