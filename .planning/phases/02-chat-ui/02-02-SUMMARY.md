@@ -16,7 +16,7 @@ key_files:
     - backend/public/index.html
 decisions:
   - "loadHistory() wrapped in try/catch per Pitfall 6 — error logged silently, feed stays in empty-state"
-  - "loadHistory reverses id DESC API array before rendering so cards display oldest-first in feed"
+  - "User requested newest-first feed order at checkpoint — removed entries.reverse() in loadHistory(), switched ask() to feed.prepend(), and scrolls to firstElementChild for newest-at-top UX"
   - "clearHistory awaits DELETE /api/history before clearing DOM — prevents race condition on slow connections (Pitfall 7)"
   - "ask() uses let data declared before try so catch block can access partial response for error card"
   - "ask() empty-state guard uses feed.querySelector('.empty-state') to detect and clear before appending placeholder"
@@ -30,7 +30,7 @@ metrics:
 
 # Phase 2 Plan 02: Wire History Feed — loadHistory, clearHistory, ask() Refactor Summary
 
-**One-liner:** loadHistory() fetches and renders collapsed history cards on page load, clearHistory() awaits DELETE and restores empty-state, and ask() now uses buildPlaceholderCard/replaceWith lifecycle replacing all innerHTML overwrites — completing the end-to-end Phase 2 chat feed experience.
+**One-liner:** loadHistory() fetches and renders collapsed history cards on page load (newest-first per user request at checkpoint), clearHistory() awaits DELETE and restores empty-state, and ask() uses buildPlaceholderCard/replaceWith lifecycle via feed.prepend() — completing the end-to-end Phase 2 chat feed experience.
 
 ## What Was Built
 
@@ -40,11 +40,11 @@ Wired up the complete chat history feed behavior in `backend/public/index.html` 
 
 **`loadHistory()`** (async):
 - Fetches `GET /api/history` with try/catch (Pitfall 6 guard)
-- Reverses the id DESC API array to display oldest-first in feed (D-07)
+- Does NOT reverse the id DESC API array — keeps newest-first order directly (user-requested at checkpoint; see Deviations)
 - Returns early if no entries (keeps empty-state as-is)
 - Clears empty-state and appends `buildHistoryCard(entry, false)` for each entry (collapsed per D-04/D-06)
 - Shows `#clearHistoryBtn` after rendering
-- Calls `feed.lastElementChild.scrollIntoView({ behavior: 'smooth' })` to auto-scroll to most recent entry
+- Calls `feed.firstElementChild.scrollIntoView({ behavior: 'smooth', block: 'start' })` to auto-scroll to newest (top) entry
 
 **`clearHistory()`** (async):
 - Guards with `window.confirm('Clear all history?')` (D-09)
@@ -60,10 +60,10 @@ Replaced entire ask() function body with placeholder card lifecycle. Key changes
 
 - **Removed:** All `results.innerHTML =` assignments (3 content overwrites + 1 loading state)
 - **Added:** Empty-state guard clears feed when first query submitted
-- **Added:** `buildPlaceholderCard(question)` appended immediately on submit + `scrollIntoView`
+- **Added:** `buildPlaceholderCard(question)` prepended at top of feed on submit (feed.prepend) + `scrollIntoView`
 - **Added:** `#clearHistoryBtn` shown when first card is appended
-- **Success path:** `buildHistoryCard(entry, true)` with `columns: data.columns || []` and `rows: data.rows || []` guards for HTTP 422; `placeholderCard.replaceWith(newCard)`; `newCard.scrollIntoView`
-- **Error path:** `buildHistoryCard(errEntry, true)` using partial data from response if available; `placeholderCard.replaceWith(errCard)`; `errCard.scrollIntoView`
+- **Success path:** `buildHistoryCard(entry, true)` with `columns: data.columns || []` and `rows: data.rows || []` guards for HTTP 422; `placeholderCard.replaceWith(newCard)`; `newCard.scrollIntoView({ block: 'start' })`
+- **Error path:** `buildHistoryCard(errEntry, true)` using partial data from response if available; `placeholderCard.replaceWith(errCard)`; `errCard.scrollIntoView({ block: 'start' })`
 - **Fixed pre-existing bug:** `btn.textContent = 'Query'` in finally block (was `'Ask Claude'`)
 
 ## Tasks Completed
@@ -72,10 +72,25 @@ Replaced entire ask() function body with placeholder card lifecycle. Key changes
 |------|--------|----------------|
 | Task 1: Implement loadHistory() and clearHistory() | 0ea3848 | backend/public/index.html |
 | Task 2: Refactor ask() to use placeholder card lifecycle | 3b48f5a | backend/public/index.html |
+| User deviation: Newest-first feed order (post-checkpoint) | a96cb84 | backend/public/index.html |
 
 ## Deviations from Plan
 
-None — plan executed exactly as written.
+### User-requested change at checkpoint
+
+**1. [User request] Feed order changed from oldest-first to newest-first**
+- **Found during:** Checkpoint (human-verify) between Task 2 and plan completion
+- **Issue:** Plan specified oldest-first feed order (entries.reverse() in loadHistory, feed.appendChild in ask). User reviewed the running app and preferred newest queries at the top.
+- **Fix:**
+  - `loadHistory()`: Removed `entries.reverse()` — API returns id DESC (newest first) which is now used directly. Scroll target changed from `feed.lastElementChild` to `feed.firstElementChild` with `block: 'start'`.
+  - `ask()`: Changed `feed.appendChild(placeholderCard)` to `feed.prepend(placeholderCard)`. Scroll target for placeholder and result cards changed to `block: 'start'` (top alignment).
+- **Files modified:** backend/public/index.html
+- **Committed in:** a96cb84 (post-checkpoint user change)
+
+---
+
+**Total deviations:** 1 (user-requested UX change at checkpoint)
+**Impact on plan:** Feed order inverted relative to plan specification. All other acceptance criteria remain satisfied — loadHistory(), clearHistory(), ask() lifecycle, XSS mitigations, and bug fix all unchanged.
 
 ## Threat Surface Scan
 
@@ -93,8 +108,9 @@ None — all data wiring is complete. loadHistory() fetches real API data, ask()
 ## Self-Check: PASSED
 
 - backend/public/index.html: FOUND
-- Commit 0ea3848 (Task 1): FOUND
-- Commit 3b48f5a (Task 2): FOUND
+- Commit 0ea3848 (Task 1 — loadHistory/clearHistory): FOUND
+- Commit 3b48f5a (Task 2 — ask() refactor): FOUND
+- Commit a96cb84 (user deviation — newest-first order): FOUND
 - npm test: PASSED (1 suite, 1 test)
 - Source assertions (all pass):
   - function loadHistory(: 1
@@ -106,3 +122,4 @@ None — all data wiring is complete. loadHistory() fetches real API data, ask()
   - escHtml(entry.question): 1
   - escHtml(entry.error): 1
   - hour12: false: 1
+  - feed.prepend(placeholderCard): 1 (newest-first — post-checkpoint deviation)
