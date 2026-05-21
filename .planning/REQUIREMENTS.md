@@ -20,22 +20,22 @@ These capabilities are already implemented in the codebase and are not planned w
 
 #### Persistence & Display
 
-- [ ] **HIST-01**: User's query history persists across page refreshes (stored in SQLite)
-- [ ] **HIST-02**: Each new Q&A result appends to the history feed instead of replacing it
-- [ ] **HIST-03**: Each history entry displays a timestamp (human-readable format)
-- [ ] **HIST-04**: The viewport automatically scrolls to the latest entry after each new query
+- [x] **HIST-01**: User's query history persists across page refreshes (stored in SQLite)
+- [x] **HIST-02**: Each new Q&A result appends to the history feed instead of replacing it
+- [x] **HIST-03**: Each history entry displays a timestamp (human-readable format)
+- [x] **HIST-04**: The viewport automatically scrolls to the latest entry after each new query
 
 #### In-Flight & Error States
 
-- [ ] **HIST-05**: A per-message loading state (spinner) displays while the AI is generating SQL
-- [ ] **HIST-06**: Failed queries are saved to history and display the error message inline in the feed
+- [x] **HIST-05**: A per-message loading state (spinner) displays while the AI is generating SQL
+- [x] **HIST-06**: Failed queries are saved to history and display the error message inline in the feed
 
 #### Safety & Controls
 
-- [ ] **HIST-07**: The backend caps stored result rows at 100 per history entry (no UI required)
-- [ ] **HIST-08**: Each history card has a "Copy SQL" button that copies the generated SQL to clipboard
-- [ ] **HIST-09**: Each history card's result table displays the row count (e.g. "42 rows")
-- [ ] **HIST-10**: A "Clear history" button deletes all history entries after user confirmation
+- [x] **HIST-07**: The backend caps stored result rows at 100 per history entry (no UI required)
+- [x] **HIST-08**: Each history card has a "Copy SQL" button that copies the generated SQL to clipboard
+- [x] **HIST-09**: Each history card's result table displays the row count (e.g. "42 rows")
+- [x] **HIST-10**: A "Clear history" button deletes all history entries after user confirmation
 
 ## v2 Requirements
 

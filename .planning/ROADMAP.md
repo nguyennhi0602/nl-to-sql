@@ -14,7 +14,7 @@ The existing NL-to-SQL tool has a working backend and query UI. This milestone a
 Decimal phases appear between their surrounding integers in numeric order.
 
 - [x] **Phase 1: Backend Persistence** - History table, HistoryModule, save-on-ask, GET/DELETE /api/history (completed 2026-05-20)
-- [ ] **Phase 2: Chat UI** - Append-based chat feed with timestamps, loading states, copy SQL, row count, and clear history
+- [x] **Phase 2: Chat UI** - Append-based chat feed with timestamps, loading states, copy SQL, row count, and clear history (completed 2026-05-21)
 
 ## Phase Details
 
@@ -63,11 +63,11 @@ Plans:
 Plans:
 **Wave 1**
 
-- [ ] 02-01-PLAN.md — CSS component classes + card builder JS helpers (buildHistoryCard, buildPlaceholderCard, formatTimestamp)
+- [x] 02-01-PLAN.md — CSS component classes + card builder JS helpers (buildHistoryCard, buildPlaceholderCard, formatTimestamp)
 
 **Wave 2** *(blocked on Wave 1 completion)*
 
-- [ ] 02-02-PLAN.md — loadHistory(), clearHistory(), refactored ask() — full end-to-end chat feed behavior
+- [x] 02-02-PLAN.md — loadHistory(), clearHistory(), refactored ask() — full end-to-end chat feed behavior
 
 ## Progress
 
@@ -76,5 +76,5 @@ Phases execute in numeric order: 1 → 2
 
 | Phase | Plans Complete | Status | Completed |
 |-------|----------------|--------|-----------|
-| 1. Backend Persistence | 0/2 | Not started | - |
-| 2. Chat UI | 0/2 | Not started | - |
+| 1. Backend Persistence | 2/2 | Complete | 2026-05-20 |
+| 2. Chat UI | 2/2 | Complete | 2026-05-21 |
