@@ -15,6 +15,7 @@ Decimal phases appear between their surrounding integers in numeric order.
 
 - [x] **Phase 1: Backend Persistence** - History table, HistoryModule, save-on-ask, GET/DELETE /api/history (completed 2026-05-20)
 - [x] **Phase 2: Chat UI** - Append-based chat feed with timestamps, loading states, copy SQL, row count, and clear history (completed 2026-05-21)
+- [ ] **Phase 3: Vercel Deployment** - Migrate SQLite → Vercel Postgres, NestJS serverless entry point, vercel.json config, env vars, GitHub CI/CD
 
 ## Phase Details
 
@@ -69,12 +70,29 @@ Plans:
 
 - [x] 02-02-PLAN.md — loadHistory(), clearHistory(), refactored ask() — full end-to-end chat feed behavior
 
+### Phase 3: Vercel Deployment
+
+**Goal**: The app runs in production on Vercel — NestJS served as a serverless function, history persisted in Vercel Postgres (Neon), environment variables configured, and every push to main triggers an automatic deployment
+**Mode:** mvp
+**Depends on**: Phase 1, Phase 2
+**Requirements**: DEPLOY-01, DEPLOY-02, DEPLOY-03, DEPLOY-04, DEPLOY-05
+**Success Criteria** (what must be TRUE):
+
+  1. `https://<project>.vercel.app` serves the chat UI and all API routes respond correctly
+  2. History entries persist across cold starts and multiple requests (stored in Vercel Postgres, not SQLite)
+  3. `GROQ_API_KEY` and `POSTGRES_URL` are set as Vercel environment variables — no secrets in the codebase
+  4. Pushing a commit to the `main` branch on GitHub automatically triggers a Vercel deployment
+  5. A preview deployment is created for every pull request
+
+**Plans**: TBD
+
 ## Progress
 
 **Execution Order:**
-Phases execute in numeric order: 1 → 2
+Phases execute in numeric order: 1 → 2 → 3
 
 | Phase | Plans Complete | Status | Completed |
 |-------|----------------|--------|-----------|
 | 1. Backend Persistence | 2/2 | Complete | 2026-05-20 |
 | 2. Chat UI | 2/2 | Complete | 2026-05-21 |
+| 3. Vercel Deployment | 0/TBD | Not started | - |

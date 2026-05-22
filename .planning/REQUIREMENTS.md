@@ -37,6 +37,14 @@ These capabilities are already implemented in the codebase and are not planned w
 - [x] **HIST-09**: Each history card's result table displays the row count (e.g. "42 rows")
 - [x] **HIST-10**: A "Clear history" button deletes all history entries after user confirmation
 
+### Deployment (Phase 3)
+
+- [ ] **DEPLOY-01**: The app is accessible at a public Vercel URL — NestJS runs as a serverless function, static frontend is served from Vercel CDN
+- [ ] **DEPLOY-02**: Chat history persists across requests — `better-sqlite3` replaced with Vercel Postgres (Neon); `query_history` table and demo seed data live in the cloud database
+- [ ] **DEPLOY-03**: Secrets are managed as Vercel environment variables (`GROQ_API_KEY`, `POSTGRES_URL`) — no credentials in the codebase or `.env` files committed to git
+- [ ] **DEPLOY-04**: Every push to `main` on GitHub automatically triggers a Vercel production deployment (GitHub integration via Vercel dashboard)
+- [ ] **DEPLOY-05**: Every pull request gets a unique Vercel preview URL for isolated testing
+
 ## v2 Requirements
 
 ### Chat History Enhancements
@@ -76,10 +84,15 @@ These capabilities are already implemented in the codebase and are not planned w
 | HIST-08 | Phase 2 | Pending |
 | HIST-09 | Phase 2 | Pending |
 | HIST-10 | Phase 2 | Pending |
+| DEPLOY-01 | Phase 3 | Pending |
+| DEPLOY-02 | Phase 3 | Pending |
+| DEPLOY-03 | Phase 3 | Pending |
+| DEPLOY-04 | Phase 3 | Pending |
+| DEPLOY-05 | Phase 3 | Pending |
 
 **Coverage:**
-- v1 requirements (new work): 10 total
-- Mapped to phases: 10
+- v1 requirements (new work): 15 total
+- Mapped to phases: 15
 - Unmapped: 0 ✓
 
 ---
