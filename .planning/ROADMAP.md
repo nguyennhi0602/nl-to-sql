@@ -80,11 +80,25 @@ Plans:
 
   1. `https://<project>.vercel.app` serves the chat UI and all API routes respond correctly
   2. History entries persist across cold starts and multiple requests (stored in Vercel Postgres, not SQLite)
-  3. `GROQ_API_KEY` and `POSTGRES_URL` are set as Vercel environment variables — no secrets in the codebase
+  3. `GROQ_API_KEY` and `DATABASE_URL` are set as Vercel environment variables — no secrets in the codebase
   4. Pushing a commit to the `main` branch on GitHub automatically triggers a Vercel deployment
   5. A preview deployment is created for every pull request
 
-**Plans**: TBD
+**Plans**: 4 plans
+
+Plans:
+**Wave 1**
+
+- [ ] 03-01-PLAN.md — DatabaseService dual-driver rewrite (SQLite + @vercel/postgres) + package install
+
+**Wave 2** *(blocked on Wave 1 — parallel, no file overlap)*
+
+- [ ] 03-02-PLAN.md — HistoryService + HistoryController + QueryController async migration
+- [ ] 03-03-PLAN.md — api/index.ts serverless entry + vercel.json + tsconfig.json update
+
+**Wave 3** *(blocked on Wave 2 completion)*
+
+- [ ] 03-04-PLAN.md — Vercel project setup, Neon Postgres, env vars, GitHub integration, smoke test
 
 ## Progress
 
@@ -95,4 +109,4 @@ Phases execute in numeric order: 1 → 2 → 3
 |-------|----------------|--------|-----------|
 | 1. Backend Persistence | 2/2 | Complete | 2026-05-20 |
 | 2. Chat UI | 2/2 | Complete | 2026-05-21 |
-| 3. Vercel Deployment | 0/TBD | Not started | - |
+| 3. Vercel Deployment | 0/4 | Not started | - |

@@ -41,7 +41,7 @@ These capabilities are already implemented in the codebase and are not planned w
 
 - [ ] **DEPLOY-01**: The app is accessible at a public Vercel URL — NestJS runs as a serverless function, static frontend is served from Vercel CDN
 - [ ] **DEPLOY-02**: Chat history persists across requests — `better-sqlite3` replaced with Vercel Postgres (Neon); `query_history` table and demo seed data live in the cloud database
-- [ ] **DEPLOY-03**: Secrets are managed as Vercel environment variables (`GROQ_API_KEY`, `POSTGRES_URL`) — no credentials in the codebase or `.env` files committed to git
+- [ ] **DEPLOY-03**: Secrets are managed as Vercel environment variables (`GROQ_API_KEY`, `DATABASE_URL`) — no credentials in the codebase or `.env` files committed to git
 - [ ] **DEPLOY-04**: Every push to `main` on GitHub automatically triggers a Vercel production deployment (GitHub integration via Vercel dashboard)
 - [ ] **DEPLOY-05**: Every pull request gets a unique Vercel preview URL for isolated testing
 
