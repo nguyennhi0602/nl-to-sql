@@ -6,13 +6,13 @@ export class HistoryController {
   constructor(private readonly historyService: HistoryService) {}
 
   @Get('history')
-  findAll() {
-    return this.historyService.findAll();
+  async findAll() {
+    return await this.historyService.findAll();
   }
 
   @Delete('history')
-  deleteAll() {
-    const deleted = this.historyService.deleteAll();
+  async deleteAll() {
+    const deleted = await this.historyService.deleteAll();
     return { deleted };
   }
 }

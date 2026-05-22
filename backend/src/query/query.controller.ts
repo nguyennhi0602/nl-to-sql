@@ -13,8 +13,8 @@ export class QueryController {
   ) {}
 
   @Get('schema')
-  getSchema() {
-    return this.db.getSchema();
+  async getSchema() {
+    return await this.db.getSchema();
   }
 
   @Post('ask')
@@ -23,13 +23,13 @@ export class QueryController {
       throw new HttpException('question is required', HttpStatus.BAD_REQUEST);
     }
 
-    const schema = this.db.getSchema();
+    const schema = await this.db.getSchema();
     const { sql, explanation } = await this.claude.naturalLanguageToSql(dto.question, schema);
 
     try {
-      const result = this.db.execute(sql);
+      const result = await this.db.execute(sql);
       try {
-        this.historyService.save({
+        await this.historyService.save({
           question: dto.question,
           sql,
           explanation,
@@ -44,7 +44,7 @@ export class QueryController {
     } catch (err: unknown) {
       const message = err instanceof Error ? err.message : String(err);
       try {
-        this.historyService.save({
+        await this.historyService.save({
           question: dto.question,
           sql,
           explanation,
@@ -60,12 +60,12 @@ export class QueryController {
   }
 
   @Post('execute')
-  execute(@Body() dto: ExecuteDto) {
+  async execute(@Body() dto: ExecuteDto) {
     if (!dto?.sql?.trim()) {
       throw new HttpException('sql is required', HttpStatus.BAD_REQUEST);
     }
     try {
-      return this.db.execute(dto.sql);
+      return await this.db.execute(dto.sql);
     } catch (err: unknown) {
       const message = err instanceof Error ? err.message : String(err);
       throw new HttpException({ error: message }, HttpStatus.UNPROCESSABLE_ENTITY);
