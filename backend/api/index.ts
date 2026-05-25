@@ -25,6 +25,12 @@ export default async function handler(
   req: IncomingMessage,
   res: ServerResponse,
 ): Promise<void> {
-  if (!nestReady) await init();
-  expressApp(req as any, res as any);
+  try {
+    if (!nestReady) await init();
+    expressApp(req as any, res as any);
+  } catch (err) {
+    const msg = err instanceof Error ? err.stack ?? err.message : String(err);
+    res.writeHead(500, { 'Content-Type': 'text/plain' });
+    res.end(`Init error: ${msg}`);
+  }
 }
