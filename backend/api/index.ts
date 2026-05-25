@@ -25,13 +25,6 @@ export default async function handler(
   req: IncomingMessage,
   res: ServerResponse,
 ): Promise<void> {
-  try {
-    if (!nestReady) await init();
-    expressApp(req as any, res as any);
-  } catch (err) {
-    const msg = err instanceof Error ? err.stack ?? err.message : String(err);
-    const dbUrl = process.env.DATABASE_URL ? 'SET' : 'MISSING';
-    res.writeHead(500, { 'Content-Type': 'text/plain' });
-    res.end(`Init error: ${msg}\nDATABASE_URL: ${dbUrl}`);
-  }
+  if (!nestReady) await init();
+  expressApp(req as any, res as any);
 }
