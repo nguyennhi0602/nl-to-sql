@@ -15,7 +15,7 @@ Decimal phases appear between their surrounding integers in numeric order.
 
 - [x] **Phase 1: Backend Persistence** - History table, HistoryModule, save-on-ask, GET/DELETE /api/history (completed 2026-05-20)
 - [x] **Phase 2: Chat UI** - Append-based chat feed with timestamps, loading states, copy SQL, row count, and clear history (completed 2026-05-21)
-- [ ] **Phase 3: Vercel Deployment** - Migrate SQLite → Vercel Postgres, NestJS serverless entry point, vercel.json config, env vars, GitHub CI/CD
+- [x] **Phase 3: Vercel Deployment** - Migrate SQLite → Vercel Postgres, NestJS serverless entry point, vercel.json config, env vars, GitHub CI/CD (completed 2026-05-25)
 
 ## Phase Details
 
@@ -89,12 +89,12 @@ Plans:
 Plans:
 **Wave 1**
 
-- [ ] 03-01-PLAN.md — DatabaseService dual-driver rewrite (SQLite + @vercel/postgres) + package install
+- [x] 03-01-PLAN.md — DatabaseService dual-driver rewrite (SQLite + @vercel/postgres) + package install
 
 **Wave 2** *(blocked on Wave 1 — parallel, no file overlap)*
 
-- [ ] 03-02-PLAN.md — HistoryService + HistoryController + QueryController async migration
-- [ ] 03-03-PLAN.md — api/index.ts serverless entry + vercel.json + tsconfig.json update
+- [x] 03-02-PLAN.md — HistoryService + HistoryController + QueryController async migration
+- [x] 03-03-PLAN.md — api/index.ts serverless entry + vercel.json + tsconfig.json update
 
 **Wave 3** *(blocked on Wave 2 completion)*
 
@@ -109,4 +109,4 @@ Phases execute in numeric order: 1 → 2 → 3
 |-------|----------------|--------|-----------|
 | 1. Backend Persistence | 2/2 | Complete | 2026-05-20 |
 | 2. Chat UI | 2/2 | Complete | 2026-05-21 |
-| 3. Vercel Deployment | 0/4 | Not started | - |
+| 3. Vercel Deployment | 4/4 | Complete | 2026-05-25 |
