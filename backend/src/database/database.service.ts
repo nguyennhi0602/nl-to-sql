@@ -1,7 +1,6 @@
 import { Injectable, OnModuleInit, OnModuleDestroy } from '@nestjs/common';
 import { createPool } from '@vercel/postgres';
 import type { VercelPool } from '@vercel/postgres';
-import Database from 'better-sqlite3';
 import * as path from 'path';
 
 export interface SchemaTable {
@@ -11,7 +10,8 @@ export interface SchemaTable {
 
 @Injectable()
 export class DatabaseService implements OnModuleInit, OnModuleDestroy {
-  private db: Database.Database | undefined;
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
+  private db: any;
   private pgPool: VercelPool | undefined;
 
   async onModuleInit() {
@@ -21,7 +21,10 @@ export class DatabaseService implements OnModuleInit, OnModuleDestroy {
       await this.initHistoryPg();
       await this.seedPg();
     } else {
-      // SQLite path — local development
+      // SQLite path — local development only. Lazy require keeps the native binary
+      // out of the Vercel function bundle (it would fail on Linux if imported at module load).
+      // eslint-disable-next-line @typescript-eslint/no-require-imports
+      const Database = require('better-sqlite3');
       this.db = new Database(path.join(process.cwd(), 'store.db'));
       this.db.pragma('journal_mode = WAL');
       this.initHistorySqlite();
